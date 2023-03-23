@@ -1,0 +1,41 @@
+import { useState } from "react"; 
+import { Configuration, OpenAIApi } from "openai";
+import { InputBox } from "./InputBox";
+ const REACT_APP_API_KEY="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"
+const configuration = new Configuration({
+  apiKey:REACT_APP_API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
+
+function App() {
+  const [userPrompt, setUserPrompt] = useState("");
+  const [number, setNumber] = useState(1);
+  const [size, setSize] = useState("256x256");
+  const [imageUrl, setImageUrl] = useState("");
+
+  const generateImage = async () => {
+    const imageParameters = {
+      prompt: userPrompt,
+      n: parseInt(number),
+      size: size,
+    };
+    const response = await openai.createImage(imageParameters);
+    const urlData = response.data.data[0].url;
+    setImageUrl(urlData);
+  };
+
+  return (
+    <main className="App">
+      {imageUrl && <img src={imageUrl} className="image" alt="ai thing" style={{objectFit:"cover",borderRadius:15, height:300,width:300,overflow:"hidden"}} />}
+      <InputBox label={"Description"} setAttribute={setUserPrompt} />
+      <InputBox label={"Amount"} setAttribute={setNumber} />
+      <InputBox label={"Size"} setAttribute={setSize} />
+      <button className="main-button" onClick={() => generateImage()}>
+        Generate
+      </button>
+    </main>
+  );
+}
+
+export default App;
